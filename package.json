@@ -1,0 +1,19 @@
+{
+  "name": "@skgrush/sync-s3",
+  "version": "0.0.1",
+  "description": "Sync directory to S3, including metadata",
+  "type": "module",
+  "dependencies": {
+    "tslib": "^2.3",
+    "rxjs": "~7.8.0",
+    "ts-node": "^10.9.1",
+    "ajv": "^8.0.0",
+    "minimist": "^1.2.0",
+    "multi-progress": "^4.0.0",
+    "progress": "^2.0.3",
+    "stream-mime-type": "^2.0.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.2.2"
+  }
+}
