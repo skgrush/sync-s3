@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { S3Client } from '@aws-sdk/client-s3';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, basename } from 'node:path';
 import { open } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { readFromBucket } from './s3.js';
@@ -53,7 +53,7 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
 }
 
 function printHelp() {
-  console.info('node', process.argv[1], c.green('[-h|--help] [--execute] [--concurrency N] [--force]'), c.red('ENV-PATH'));
+  console.info(basename(process.argv[0]), process.argv[1], c.green('[-h|--help] [--execute] [--concurrency N] [--force]'), c.red('ENV-PATH'));
   console.info();
   console.info('Required positionals');
   console.info(' ', c.red('ENV-PATH'), 'path to env JSON compliant with env.schema.json');

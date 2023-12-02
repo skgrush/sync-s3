@@ -12,11 +12,13 @@
     "rootDir": "src/",
     "skipLibCheck": true,
     "declaration": true,
+    "resolveJsonModule": true
   },
   "ts-node": {
     "esm": true
   },
   "include": [
-    "./src/**.ts"
+    "./src/**.ts",
+    "./src/**.json"
   ]
 }
