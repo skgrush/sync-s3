@@ -9,6 +9,7 @@
     "lib/**/*"
   ],
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.465.0",
     "ajv": "^8.0.0",
     "ansi-colors": "^4.1.3",
     "minimist": "^1.2.0",
@@ -19,6 +20,10 @@
     "tslib": "^2.3"
   },
   "devDependencies": {
+    "@types/minimist": "^1.2.5",
+    "@types/multi-progress": "^2.0.6",
+    "@types/node": "^20.10.2",
+    "@types/progress": "^2.0.7",
     "typescript": "~5.2.2"
   },
   "scripts": {
