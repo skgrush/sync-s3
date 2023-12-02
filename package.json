@@ -1,12 +1,27 @@
 {
   "name": "@skgrush/sync-s3",
-  "version": "0.0.1",
-  "description": "Sync directory to S3, including metadata",
+  "version": "0.0.1-rc.0",
+  "description": "Sync a directory to S3, including metadata for specific files.",
+  "homepage": "https://github.com/skgrush/sync-s3#readme",
+  "license": "MIT",
+  "author": {
+    "name": "Samuel K. Grush"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skgrush/sync-s3.git"
+  },
+  "keywords": [
+    "aws",
+    "s3"
+  ],
   "type": "module",
   "types": "lib",
-  "bin": "dist/migrate.js",
+  "bin": {
+    "sync-s3": "dist/migrate.js"
+  },
   "files": [
-    "lib/**/*"
+    "dist/"
   ],
   "dependencies": {
     "@aws-sdk/client-s3": "^3.465.0",
@@ -24,9 +39,11 @@
     "@types/multi-progress": "^2.0.6",
     "@types/node": "^20.10.2",
     "@types/progress": "^2.0.7",
+    "rimraf": "^5.0.5",
     "typescript": "~5.2.2"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "clean": "rimraf dist"
   }
 }
