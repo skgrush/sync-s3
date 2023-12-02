@@ -5,7 +5,8 @@ import { JTDDataType } from 'ajv/dist/types/jtd-schema.js';
 
 const Ajv = AjvModule.default;
 
-export const validator = new Ajv().compile(EnvSchema);
+const ajv = new Ajv();
+export const validator = ajv.compile(EnvSchema);
 
 export type IEnv = JTDDataType<typeof EnvSchema>;
 
@@ -18,7 +19,7 @@ export async function getEnvironment(envPath: string) {
   const json = JSON.parse(contents);
 
   if (!validator(json)) {
-    throw new Error(`Failed to read ICredentials from ${JSON.stringify(envPath)}`);
+    throw new Error(`Failed to read from ${JSON.stringify(envPath)}; errors: ${ajv.errorsText(validator.errors)}`);
   }
 
   return json;

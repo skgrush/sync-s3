@@ -6,10 +6,14 @@ export const EnvSchema = {
   "required": [
     "region",
     "bucket",
-    "copySourceRelative",
+    "copySourceDirectory",
+    "metadataFile",
     "credentials"
   ],
   "properties": {
+    "$schema": {
+      "type": "string"
+    },
     "region": {
       "type": "string"
     },

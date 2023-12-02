@@ -15,7 +15,8 @@ import { MigrateProgressBars } from './progress-bars.js';
 import { IEnv, getEnvironment } from './env.js';
 import c from 'ansi-colors';
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+const mainUrl = pathToFileURL(process.argv[1]).href;
+if (import.meta.url === mainUrl || mainUrl.endsWith('/.bin/sync-s3')) {
 
   const {
     execute,
