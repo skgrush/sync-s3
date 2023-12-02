@@ -1,5 +1,5 @@
-import { WalkResult } from "./hash";
-import { S3Object } from "./s3";
+import { WalkResult } from "./hash.js";
+import { S3Object } from "./s3.js";
 
 export enum CompareType {
   NoChange = 1,

@@ -1,40 +1,88 @@
+#!/usr/bin/env node
+
 import { S3Client } from '@aws-sdk/client-s3';
-import { join, normalize } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { open } from 'node:fs/promises';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { pathToFileURL } from 'node:url';
 import { readFromBucket } from './s3.js';
 import { walkDirectory } from './hash.js';
 import { CompareType, ComparedItem, compareS3 } from './compare-s3.js';
-import { IMigrateMetadata } from './metadata.interface';
+import { IMigrateMetadata } from './metadata.interface.js';
 import minimist from 'minimist';
 import { SyncOperator, SyncResultType } from './sync-operator.js';
 import { catchError, firstValueFrom, forkJoin, map, of, reduce } from 'rxjs';
 import { MigrateProgressBars } from './progress-bars.js';
 import { IEnv, getEnvironment } from './env.js';
-
-const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const repoRootPath = normalize(join(__dirname, '../'));
+import c from 'ansi-colors';
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  void main();
-}
-
-async function main() {
 
   const {
-    execute: argExecute,
-    concurrency: argConcurrency,
-    force: argForce,
+    execute,
+    concurrency,
+    force,
+    h,
+    help,
+    _: args,
+    ...otherParams
   } = minimist(process.argv.slice(2));
 
-  const env = await getEnvironment(join(repoRootPath, './scripts/.env.json'));
+  if (h || help) {
+    printHelp();
+    process.exit(127);
+  }
+
+  const otherOptionKeys = Object.keys(otherParams);
+  if (otherOptionKeys.length) {
+    console.error('CLI ERROR: Unexpected optional parameters', otherOptionKeys);
+    process.exit(2);
+  }
+
+  const [envJsonPath, ...otherArgs] = args;
+  if (!envJsonPath || otherArgs.length > 0) {
+    console.error('CLI ERROR: Expects exactly one positional argument, the env.json path\n');
+    process.exit(2);
+  }
+
+  void main(
+    execute,
+    concurrency,
+    force,
+    envJsonPath,
+  );
+}
+
+function printHelp() {
+  console.info('node', process.argv[1], c.green('[-h|--help] [--execute] [--concurrency N] [--force]'), c.red('ENV-PATH'));
+  console.info();
+  console.info('Required positionals');
+  console.info(' ', c.red('ENV-PATH'), 'path to env JSON compliant with env.schema.json');
+  console.info();
+  console.info('Options');
+  console.info(' ', c.green('--execute'), 'Execute the operation (anti dry-run)');
+  console.info(' ', c.green('--concurrency'), 'Number of parallel upload operations; default=4');
+  console.info(' ', c.green('--force'), 'Force upload even if there is no change to the file');
+  console.info(' ', c.green('-h|--help'), 'Print this help text and exit');
+}
+
+export async function main(
+  execute: boolean,
+  concurrency: number,
+  force: boolean,
+  envJsonPath: string,
+) {
+  const envDirectory = dirname(envJsonPath);
+
+  const env = await getEnvironment(envJsonPath);
+  const copySourceDirectory = resolve(envDirectory, env.copySourceDirectory);
+  const metadataPath = resolve(envDirectory, env.metadataFile);
+
   const client = await getClient(env);
 
   const bucketContents = await readFromBucket(env.bucket, client);
 
-  const basePathAbs = normalize(join(__dirname, env.copySourceDirectory));
   const walkIter = walkDirectory(
-    basePathAbs,
+    copySourceDirectory,
     '',
     {
       hashAlgorithm: 'md5',
@@ -50,30 +98,29 @@ async function main() {
   }
   console.groupEnd();
 
-  const metadatas = await getMetadata();
+  const metadatas = await getMetadata(metadataPath);
   console.group('Metadatas:');
   console.info(JSON.stringify(metadatas, undefined, 2));
 
 
-  if (!argExecute) {
+  if (!execute) {
     console.warn('Missing --execute, stopping.');
     return;
   }
 
-  let concurrency = 4;
-  if (argConcurrency !== undefined) {
-    concurrency = argConcurrency;
+  if (concurrency !== undefined) {
     if (typeof concurrency !== 'number' || concurrency < 1) {
       throw new TypeError('argv concurrency must be a number > 1');
     }
   } else {
+    concurrency = 4;
     console.warn('Missing --concurrency, defaulting to', concurrency);
   }
 
-  if (argForce) {
+  if (force) {
     console.warn('--force provided; NoChange files will be uploaded');
   }
-  const comparisonFilter: (kv: [key: string, value: ComparedItem]) => boolean = argForce
+  const comparisonFilter: (kv: [key: string, value: ComparedItem]) => boolean = force
     ? kv => true
     : ([k, v]) => v.type !== CompareType.NoChange;
   const todoComparisons = new Map([...allComparisons].filter(comparisonFilter));
@@ -86,8 +133,8 @@ async function main() {
     env.bucket,
     client,
     metadatas,
-    basePathAbs,
-    argForce,
+    copySourceDirectory,
+    force,
   ));
 
   const progressBars = new MigrateProgressBars(
@@ -117,7 +164,7 @@ async function main() {
   console.error('\n\nSomething went wrong!\n\n');
   for (const operator of operators) {
     for (const { item, error } of operator.getLatestErrors()) {
-      console.error('\n\n###########################')
+      console.error('\n\n###########################');
       console.error('Item:', item);
       console.error('Error:', error);
     }
@@ -145,8 +192,7 @@ async function getClient(env: IEnv) {
 }
 
 
-async function getMetadata(): Promise<IMigrateMetadata> {
-  const path = join(repoRootPath, 'scripts/metadata.json');
+async function getMetadata(path: string): Promise<IMigrateMetadata> {
   const file = await open(path);
 
   const contents = await file.readFile({ encoding: 'utf8' });

@@ -1,7 +1,9 @@
-import Ajv from 'ajv';
+import AjvModule from 'ajv';
 import { open } from 'node:fs/promises';
-import { EnvSchema } from './env.schema';
-import { JTDDataType } from 'ajv/dist/types/jtd-schema';
+import { EnvSchema } from './env.schema.js';
+import { JTDDataType } from 'ajv/dist/types/jtd-schema.js';
+
+const Ajv = AjvModule.default;
 
 export const validator = new Ajv().compile(EnvSchema);
 

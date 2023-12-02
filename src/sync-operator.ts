@@ -1,6 +1,6 @@
 import { DeleteObjectCommand, DeleteObjectCommandOutput, PutObjectCommand, PutObjectCommandOutput, S3Client } from "@aws-sdk/client-s3";
 import { CompareType, ComparedItem } from "./compare-s3.js";
-import { IMigrateMetadata, IMigrateObjectMetadata } from "./metadata.interface";
+import { IMigrateMetadata, IMigrateObjectMetadata } from "./metadata.interface.js";
 import { open } from "node:fs/promises";
 import { join } from "node:path";
 import { concatAll, defer, from, map } from "rxjs";
