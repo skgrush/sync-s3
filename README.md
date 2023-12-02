@@ -1,6 +1,10 @@
 # @skgrush/sync-s3
 
-Little tool for syncing files into an S3 bucket.
+> Little tool for syncing files into an S3 bucket.
+
+![](https://img.shields.io/github/license/skgrush/sync-s3.svg?style=flat-square)
+![](https://img.shields.io/npm/v/@skgrush/sync-s3.svg?style=flat-square)
+![](https://img.shields.io/bundlephobia/min/@skgrush/sync-s3)
 
 Expects that all files in the copySourceDirectory should replace all the files
 in the S3 bucket, and synchronizes them lazily based on MD5 hashes.

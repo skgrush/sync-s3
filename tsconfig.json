@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
-    "target": "es2020",
+    "target": "es2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "baseUrl": ".",
@@ -16,7 +16,8 @@
     "rootDir": "src/",
     "skipLibCheck": true,
     "declaration": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "useDefineForClassFields": false
   },
   "ts-node": {
     "esm": true
