@@ -20,6 +20,9 @@ export const EnvSchema = {
     "bucket": {
       "type": "string"
     },
+    "prefix": {
+      "type": "string"
+    },
     "copySourceDirectory": {
       "type": "string"
     },

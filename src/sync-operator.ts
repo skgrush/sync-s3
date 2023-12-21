@@ -133,6 +133,7 @@ export class SyncOperator {
 
   async #put(item: ComparedItem, metadata: IMigrateObjectMetadata | undefined) {
     try {
+      const key = item.key;
       const local = item.localObject!;
       const fullPath = join(this.basePath, local.key);
       const fd = await open(fullPath);
@@ -143,7 +144,7 @@ export class SyncOperator {
       const command = new PutObjectCommand({
         ...metadata,
         Bucket: this.bucket,
-        Key: local.key,
+        Key: key,
         ContentMD5: b64md5,
         ContentType: local.mime,
         Body: fd.createReadStream(),

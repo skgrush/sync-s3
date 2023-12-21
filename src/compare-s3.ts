@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { WalkResult } from "./hash.js";
 import { S3Object } from "./s3.js";
 
@@ -10,9 +11,9 @@ export enum CompareType {
 
 export class ComparedItem {
   readonly type = ComparedItem.getType(this.s3Object, this.localObject);
-  readonly key = this.s3Object?.Key ?? this.localObject?.key!;
 
   constructor(
+    readonly key: string,
     readonly s3Object: S3Object | undefined,
     readonly localObject: WalkResult | undefined,
   ) { }
@@ -36,7 +37,11 @@ export class ComparedItem {
   }
 }
 
-export async function compareS3(s3Objects: S3Object[], localIterator: AsyncGenerator<WalkResult>) {
+export async function compareS3(
+  s3Objects: S3Object[],
+  localIterator: AsyncGenerator<WalkResult>,
+  prefix: string = '',
+) {
 
   const s3LookupByKey = new Map(
     s3Objects.map(obj => [obj.Key!, obj])
@@ -46,16 +51,20 @@ export async function compareS3(s3Objects: S3Object[], localIterator: AsyncGener
 
   for await (const localItem of localIterator) {
     const key = localItem.key;
-    const matchingKeyS3Object = s3LookupByKey.get(key);
+    const prefixedKey = join(prefix, key);
+    const matchingKeyS3Object = s3LookupByKey.get(prefixedKey);
 
-    comparedItems.set(key, new ComparedItem(matchingKeyS3Object, localItem));
+    comparedItems.set(prefixedKey, new ComparedItem(prefixedKey, matchingKeyS3Object, localItem));
   }
   // now all local items and their corresponding S3 objects are accounted for
 
   for (const [key, s3object] of s3LookupByKey) {
+    if (key === prefix) {
+      continue;
+    }
     if (!comparedItems.has(key)) {
       // item exists in s3 but not locally
-      comparedItems.set(key, new ComparedItem(s3object, undefined));
+      comparedItems.set(key, new ComparedItem(key, s3object, undefined));
     }
   }
   // all items are now accounted for

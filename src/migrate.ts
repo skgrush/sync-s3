@@ -80,7 +80,7 @@ export async function main(
 
   const client = await getClient(env);
 
-  const bucketContents = await readFromBucket(env.bucket, client);
+  const bucketContents = await readFromBucket(env.bucket, client, env.prefix);
 
   const walkIter = walkDirectory(
     copySourceDirectory,
@@ -91,7 +91,7 @@ export async function main(
     },
   );
 
-  const allComparisons = await compareS3(bucketContents, walkIter);
+  const allComparisons = await compareS3(bucketContents, walkIter, env.prefix);
 
   console.group('Comparisons:');
   for (const [key, val] of allComparisons) {
@@ -137,6 +137,15 @@ export async function main(
     copySourceDirectory,
     force,
   ));
+
+  console.info({
+    comps: [...todoComparisons].map(([key, v]) => ({
+      key,
+      type: v.type
+    })),
+    compSizes: todoComparisons.size,
+    totalSize,
+  })
 
   const progressBars = new MigrateProgressBars(
     todoComparisons.size,

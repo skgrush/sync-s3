@@ -2,9 +2,10 @@ import { ListObjectsCommand, S3Client, _Object } from "@aws-sdk/client-s3";
 
 export type S3Object = _Object;
 
-export async function readFromBucket(bucket: string, client: S3Client): Promise<S3Object[]> {
+export async function readFromBucket(bucket: string, client: S3Client, prefix?: string): Promise<S3Object[]> {
   const command = new ListObjectsCommand({
     Bucket: bucket,
+    Prefix: prefix,
   });
 
   try {
