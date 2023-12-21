@@ -1,6 +1,6 @@
 {
   "name": "@skgrush/sync-s3",
-  "version": "0.0.1-rc.1",
+  "version": "0.0.1-rc.2",
   "description": "Sync a directory to S3, including metadata for specific files.",
   "homepage": "https://github.com/skgrush/sync-s3#readme",
   "license": "MIT",
