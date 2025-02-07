@@ -139,10 +139,6 @@ export async function main(
   ));
 
   console.info({
-    comps: [...todoComparisons].map(([key, v]) => ({
-      key,
-      type: v.type
-    })),
     compSizes: todoComparisons.size,
     totalSize,
   })
