@@ -147,6 +147,7 @@ export class SyncOperator {
         Key: key,
         ContentMD5: b64md5,
         ContentType: local.mime,
+        ContentLength: local.size,
         Body: fd.createReadStream(),
       });
 
