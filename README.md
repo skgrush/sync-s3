@@ -1,6 +1,6 @@
 # @skgrush/sync-s3
 
-> Little tool for syncing files into an S3 bucket.
+> Little tool for syncing files and metadata into an S3 bucket.
 
 ![](https://img.shields.io/github/license/skgrush/sync-s3.svg?style=flat-square)
 ![](https://img.shields.io/npm/v/@skgrush/sync-s3.svg?style=flat-square)
