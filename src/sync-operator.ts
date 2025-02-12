@@ -4,6 +4,7 @@ import { IMigrateMetadata, IMigrateObjectMetadata } from "./metadata.interface.j
 import { open } from "node:fs/promises";
 import { join } from "node:path";
 import { concatAll, defer, from, map } from "rxjs";
+import { isMatch } from 'micromatch';
 
 export enum SyncResultType {
   Error = 0,
@@ -93,6 +94,20 @@ export class SyncOperator {
       concatAll(),
     );
   }
+  
+  #getMetadatas(key: string) {
+    const meta: IMigrateMetadata = {};
+    for (const [matchKey, matchMetadata] of Object.entries(this.metadata)) {
+      if (isMatch(key, matchKey, { })) {
+        Object.assign(meta, matchMetadata);
+      }
+    }
+    
+    if (Object.keys(meta).length) {
+      return meta;
+    }
+    return undefined;
+  }
 
   async #executeTransfer(item: ComparedItem): Promise<ISyncResult> {
     if (item.type === CompareType.NoChange && !this.force) {
@@ -103,7 +118,7 @@ export class SyncOperator {
     }
 
     const key = item.key;
-    const metadata = this.metadata[key];
+    const metadata = this.#getMetadatas(key);
 
     let result: PutObjectCommandOutput | DeleteObjectCommandOutput | null;
 
