@@ -32,18 +32,40 @@ export const EnvSchema = {
     "credentials": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "accessKeyId",
-        "secretAccessKey"
-      ],
-      "properties": {
-        "accessKeyId": {
-          "type": "string"
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "accessKeyId",
+            "secretAccessKey"
+          ],
+          "properties": {
+            "accessKeyId": {
+              "type": "string"
+            },
+            "secretAccessKey": {
+              "type": "string"
+            }
+          }
         },
-        "secretAccessKey": {
-          "type": "string"
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "accessKeyIdEnv",
+            "secretAccessKeyEnv"
+          ],
+          "properties": {
+            "accessKeyIdEnv": {
+              "type": "string"
+            },
+            "secretAccessKeyEnv": {
+              "type": "string"
+            }
+          }
         }
-      }
+      ]
     }
   }
 } as const satisfies Schema;

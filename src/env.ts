@@ -16,7 +16,7 @@ export async function getEnvironment(envPath: string) {
   const contents = await file.readFile({ encoding: 'utf8' });
   await file.close();
 
-  const json = JSON.parse(contents);
+  const json: IEnv = JSON.parse(contents);
 
   if (!validator(json)) {
     throw new Error(`Failed to read from ${JSON.stringify(envPath)}; errors: ${ajv.errorsText(validator.errors)}`);

@@ -78,7 +78,7 @@ export async function main(
   const copySourceDirectory = resolve(envDirectory, env.copySourceDirectory);
   const metadataPath = resolve(envDirectory, env.metadataFile);
 
-  const client = await getClient(env);
+  const client = getClient(env);
 
   const bucketContents = await readFromBucket(env.bucket, client, env.prefix);
 
@@ -177,14 +177,29 @@ export async function main(
   }
 }
 
-async function getClient(env: IEnv) {
+function getClient(env: IEnv) {
   const {
     region,
-    credentials: {
-      accessKeyId,
-      secretAccessKey,
-    }
   } = env;
+  
+  const credentials = env.credentials as Record<string, string>;
+  
+  const {
+    accessKeyId,
+    secretAccessKey,
+  } = 'accessKeyId' in credentials
+    ? credentials
+    : {
+        accessKeyId: process.env[credentials.accessKeyIdEnv],
+        secretAccessKey: process.env[credentials.secretAccessKeyEnv],
+      };
+  
+  if (!accessKeyId) {
+    throw new Error('Missing accessKeyId in env');
+  }
+  if (!secretAccessKey) {
+    throw new Error('Missing secretAccessKey in env');
+  }
 
   const client = new S3Client({
     region,
