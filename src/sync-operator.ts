@@ -4,7 +4,7 @@ import { IMigrateMetadata, IMigrateObjectMetadata } from "./metadata.interface.j
 import { open } from "node:fs/promises";
 import { join } from "node:path";
 import { concatAll, defer, from, map } from "rxjs";
-import { isMatch } from 'micromatch';
+import micromatch from 'micromatch';
 
 export enum SyncResultType {
   Error = 0,
@@ -98,7 +98,7 @@ export class SyncOperator {
   #getMetadatas(key: string) {
     const meta: IMigrateMetadata = {};
     for (const [matchKey, matchMetadata] of Object.entries(this.metadata)) {
-      if (isMatch(key, matchKey, { })) {
+      if (micromatch.isMatch(key, matchKey, { })) {
         Object.assign(meta, matchMetadata);
       }
     }
