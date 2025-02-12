@@ -95,14 +95,14 @@ export async function main(
 
   console.group('Comparisons:');
   for (const [key, val] of allComparisons) {
-    console.info(key, ':', CompareType[val.type]);
+    console.info(key, ':', CompareType[val.type], val.localObject?.mime);
   }
   console.groupEnd();
 
   const metadatas = await getMetadata(metadataPath);
   console.group('Metadatas:');
   console.info(JSON.stringify(metadatas, undefined, 2));
-
+  console.groupEnd();
 
   if (!execute) {
     console.warn('Missing --execute, stopping.');
