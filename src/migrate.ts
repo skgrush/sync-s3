@@ -180,9 +180,8 @@ export async function main(
 function getClient(env: IEnv) {
   const {
     region,
+      credentials,
   } = env;
-  
-  const credentials = env.credentials as Record<string, string>;
   
   const {
     accessKeyId,
