@@ -1,6 +1,6 @@
 {
   "name": "@skgrush/sync-s3",
-  "version": "0.1.0-rc.3",
+  "version": "0.1.0-rc.4",
   "description": "Sync a directory to S3, including metadata for specific files.",
   "homepage": "https://github.com/skgrush/sync-s3#readme",
   "license": "MIT",
@@ -50,6 +50,6 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "engines": {
-    "node": ">=16.11"
+    "node": "^16.14.0 || ^17.1.0 || >=18.20"
   }
 }
