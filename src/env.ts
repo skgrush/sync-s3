@@ -1,6 +1,6 @@
 import AjvModule from 'ajv';
 import { open } from 'node:fs/promises';
-import EnvSchema from './env.schema.json' assert { type: 'json' };
+import EnvSchema from './env.schema.json' with { type: 'json' };
 
 const Ajv = AjvModule.default;
 
