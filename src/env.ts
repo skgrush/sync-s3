@@ -1,14 +1,23 @@
 import AjvModule from 'ajv';
 import { open } from 'node:fs/promises';
-import { EnvSchema } from './env.schema.js';
-import { JTDDataType } from 'ajv/dist/types/jtd-schema.js';
+import EnvSchema from './env.schema.json' with { type: 'json' };
 
 const Ajv = AjvModule.default;
 
-const ajv = new Ajv();
-export const validator = ajv.compile(EnvSchema);
+export type IEnv = {
+  readonly $schema: string;
+  readonly region: string;
+  readonly bucket: string;
+  readonly prefix: string;
+  readonly copySourceDirectory: string;
+  readonly metadataFile: string;
+  readonly credentials: 
+    | { readonly accessKeyId: string, readonly secretAccessKey: string }
+    | { readonly accessKeyIdEnv: string; readonly secretAccessKeyEnv: string }  
+};
 
-export type IEnv = JTDDataType<typeof EnvSchema>;
+const ajv = new Ajv();
+export const validator = ajv.compile<IEnv>(EnvSchema);
 
 export async function getEnvironment(envPath: string) {
   const file = await open(envPath);
@@ -19,6 +28,7 @@ export async function getEnvironment(envPath: string) {
   const json = JSON.parse(contents);
 
   if (!validator(json)) {
+    console.error('env.json:', json);
     throw new Error(`Failed to read from ${JSON.stringify(envPath)}; errors: ${ajv.errorsText(validator.errors)}`);
   }
 

@@ -78,7 +78,7 @@ export async function main(
   const copySourceDirectory = resolve(envDirectory, env.copySourceDirectory);
   const metadataPath = resolve(envDirectory, env.metadataFile);
 
-  const client = await getClient(env);
+  const client = getClient(env);
 
   const bucketContents = await readFromBucket(env.bucket, client, env.prefix);
 
@@ -95,14 +95,14 @@ export async function main(
 
   console.group('Comparisons:');
   for (const [key, val] of allComparisons) {
-    console.info(key, ':', CompareType[val.type]);
+    console.info(key, ':', CompareType[val.type], val.localObject?.mime);
   }
   console.groupEnd();
 
   const metadatas = await getMetadata(metadataPath);
   console.group('Metadatas:');
   console.info(JSON.stringify(metadatas, undefined, 2));
-
+  console.groupEnd();
 
   if (!execute) {
     console.warn('Missing --execute, stopping.');
@@ -139,10 +139,6 @@ export async function main(
   ));
 
   console.info({
-    comps: [...todoComparisons].map(([key, v]) => ({
-      key,
-      type: v.type
-    })),
     compSizes: todoComparisons.size,
     totalSize,
   })
@@ -181,14 +177,28 @@ export async function main(
   }
 }
 
-async function getClient(env: IEnv) {
+function getClient(env: IEnv) {
   const {
     region,
-    credentials: {
-      accessKeyId,
-      secretAccessKey,
-    }
+      credentials,
   } = env;
+  
+  const {
+    accessKeyId,
+    secretAccessKey,
+  } = 'accessKeyId' in credentials
+    ? credentials
+    : {
+        accessKeyId: process.env[credentials.accessKeyIdEnv],
+        secretAccessKey: process.env[credentials.secretAccessKeyEnv],
+      };
+  
+  if (!accessKeyId) {
+    throw new Error('Missing accessKeyId in env');
+  }
+  if (!secretAccessKey) {
+    throw new Error('Missing secretAccessKey in env');
+  }
 
   const client = new S3Client({
     region,
